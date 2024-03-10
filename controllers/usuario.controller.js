@@ -1,10 +1,24 @@
 
-const formularioLogin = ( req, res ) => {
+const formLogin = ( req, res ) => {
     res.render('auth/login', {
-        autenticado: true
+        pagina: 'Iniciar sesión'
+    })
+}
+
+const formRegister = ( req, res ) => {
+    res.render('auth/register', {
+        pagina: 'Crear cuenta'
+    })
+}
+
+const formForgetPassword = ( req, res ) => {
+    res.render('auth/forget-password', {
+        pagina: 'Recupera tu acceso a bienes raices'
     })
 }
 
 export  {
-    formularioLogin
+    formLogin,
+    formRegister,
+    formForgetPassword
 }
