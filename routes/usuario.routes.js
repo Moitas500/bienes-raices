@@ -1,5 +1,5 @@
 import express from 'express'
-import { formLogin, formRegister, formForgetPassword, register } from '../controllers/usuario.controller.js' 
+import { formLogin, formRegister, formForgetPassword, register, resetPassword } from '../controllers/usuario.controller.js' 
 
 const router = express.Router()
 
@@ -9,5 +9,6 @@ router.get('/register', formRegister)
 router.post('/register', register)
 
 router.get('/forget-password', formForgetPassword)
+router.post('/forget-password', resetPassword)
 
 export default router
