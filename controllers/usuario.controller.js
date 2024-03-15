@@ -1,10 +1,12 @@
 import { check, validationResult } from 'express-validator'
-import { generateId } from '../helpers/tokens.js'
+import  jwt  from 'jsonwebtoken'
+import { generateId, generateJWT } from '../helpers/tokens.js'
 import Usuario from '../models/Usuario.js'
 
 const formLogin = ( req, res ) => {
     res.render('auth/login', {
-        pagina: 'Iniciar sesión'
+        pagina: 'Iniciar sesión',
+        csrfToken: req.csrfToken()
     })
 }
 
@@ -62,6 +64,50 @@ const register = async ( req, res ) => {
     })
 }
 
+const authenticate = async ( req, res ) => {
+    //Validation
+    await check( 'email' ).isEmail().withMessage( 'El email es obligatorio' ).run( req )
+    await check( 'password' ).notEmpty().withMessage( 'El password es obligatorio' ).run( req )
+
+    let result = validationResult( req )
+
+    //Verified result
+    if ( !result.isEmpty() ) {
+        return res.render('auth/login', {
+            pagina: 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: result.array(),
+        })
+    }
+
+    const { email, password } = req.body
+
+    const usuario = await Usuario.findOne({ where: { email }})
+
+    if ( !usuario ) {
+        return res.render('auth/login', {
+            pagina: 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: 'El usuario no existe' }]
+        })
+    }
+
+    if ( !usuario.verifiedPassword( password ) ) {
+        return res.render('auth/login', {
+            pagina: 'Iniciar sesión',
+            csrfToken: req.csrfToken(),
+            errores: [{ msg: 'El password es incorrecto' }]
+        })
+    }
+
+    const token = generateJWT( usuario.id )
+
+    return res.cookie('_token', token, {
+        httpOnly: true,
+        //secure: true
+    }).redirect('/mis-propiedades')
+}
+
 const formForgetPassword = ( req, res ) => {
     res.render('auth/forget-password', {
         pagina: 'Recupera tu acceso a bienes raices',
@@ -107,5 +153,6 @@ export  {
     formRegister,
     formForgetPassword,
     register,
-    resetPassword
+    resetPassword,
+    authenticate
 }
