@@ -105,7 +105,7 @@ const authenticate = async ( req, res ) => {
     return res.cookie('_token', token, {
         httpOnly: true,
         //secure: true
-    }).redirect('/mis-propiedades')
+    }).redirect('/my-properties')
 }
 
 const formForgetPassword = ( req, res ) => {
